@@ -1,0 +1,337 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#030807">
+<title>MiUSDT Wallet</title>
+<style>
+:root {
+  --bg:#030807;
+  --panel:#0a1414;
+  --panel2:#0e1c1c;
+  --green:#00f5a0;
+  --cyan:#00d9c0;
+  --text:#effff9;
+  --muted:#7f9d94;
+  --border:#173a32;
+  --red:#ff5368;
+}
+* {box-sizing:border-box}
+body {
+  margin:0;
+  background:radial-gradient(ellipse at 50% -20%,#06372b 0%,var(--bg) 48%);
+  color:var(--text);
+  font-family:system-ui,-apple-system,sans-serif;
+  min-height:100vh;
+}
+button,input {font:inherit}
+button {cursor:pointer}
+.app {max-width:480px;margin:auto;padding:22px 17px 105px}
+.top {display:flex;align-items:center;justify-content:space-between;margin-bottom:22px}
+.brand {display:flex;align-items:center;gap:11px;font-size:18px;font-weight:750}
+.logo {
+ width:43px;height:43px;border-radius:15px;
+ display:grid;place-items:center;font-size:23px;
+ color:#00150e;background:linear-gradient(145deg,#62ffd0,#00a875);
+ box-shadow:0 0 22px #00f5a044;
+}
+.round {
+ width:42px;height:42px;border:1px solid var(--border);
+ border-radius:14px;background:var(--panel);color:var(--green);
+}
+.demo {
+ border:1px solid #12634a;border-radius:30px;padding:8px 12px;
+ color:var(--green);background:#062319;font-size:12px;
+ display:inline-flex;gap:8px;align-items:center;margin-bottom:14px;
+}
+.dot {width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 10px var(--green)}
+.balance {
+ position:relative;overflow:hidden;padding:23px 20px;border-radius:24px;
+ border:1px solid #08795c;
+ background:linear-gradient(135deg,#0b2924,#071311 62%,#064332);
+ box-shadow:0 10px 35px #00f5a00c;
+}
+.balance:before {
+ content:"";position:absolute;width:180px;height:180px;right:-70px;top:-95px;
+ background:#00f5a018;filter:blur(22px);border-radius:50%;
+}
+.brow {display:flex;justify-content:space-between;align-items:center;color:#9bc7b9;font-size:13px}
+.amount {font-size:35px;font-weight:750;letter-spacing:-1px;margin:13px 0 5px}
+.amount small {font-size:15px;color:#9fc5b9;letter-spacing:0}
+.sub {font-size:12px;color:var(--muted)}
+.chart {height:35px;margin-top:10px;display:flex;align-items:end;gap:5px}
+.chart i {display:block;flex:1;border-radius:5px 5px 0 0;background:linear-gradient(#00f5a0aa,#00f5a00a);animation:rise .8s ease both}
+@keyframes rise {from{height:2px;opacity:.2}to{opacity:1}}
+.networks {display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:17px 0}
+.net {
+ padding:12px 8px;border:1px solid var(--border);border-radius:15px;
+ color:#a9c5bd;background:#081211;font-size:12px;
+}
+.net.active {border-color:var(--green);background:#063126;color:#fff;box-shadow:inset 0 0 18px #00f5a00a}
+.net b {display:block;font-size:13px;margin-bottom:3px}
+.actions {display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:19px 0 27px}
+.action {border:0;background:none;color:var(--muted);font-size:12px;text-align:center;padding:0}
+.action span {
+ display:grid;place-items:center;width:53px;height:53px;margin:0 auto 8px;
+ border:1px solid #21463c;border-radius:18px;background:linear-gradient(145deg,#10221f,#07100e);
+ color:var(--green);font-size:22px;transition:.2s;
+}
+.action:active span {transform:scale(.92);box-shadow:0 0 18px #00f5a055}
+.sectionhead {display:flex;justify-content:space-between;align-items:center;margin:23px 0 13px}
+h2 {font-size:17px;margin:0;font-weight:700}
+.link {color:var(--green);font-size:12px;background:none;border:0}
+.asset,.transaction,.setting {
+ display:flex;align-items:center;gap:12px;padding:14px;
+ background:linear-gradient(110deg,#0d1918,#081110);
+ border:1px solid #132c26;border-radius:17px;margin-bottom:9px;
+}
+.coin {width:42px;height:42px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:18px}
+.usdt {background:#0b8765;color:#fff}
+.trx {background:#e73b4b;color:white}
+.bnb {background:#f0b90b;color:#211800}
+.details {flex:1;min-width:0}
+.details b {display:block;font-size:14px;font-weight:650}
+.details small {display:block;font-size:11px;color:var(--muted);margin-top:4px}
+.value {text-align:right;font-size:13px;font-weight:650}
+.value small {display:block;color:var(--muted);font-size:11px;margin-top:4px}
+.page {display:none;animation:fade .25s ease}
+.page.active {display:block}
+@keyframes fade {from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.nav {
+ position:fixed;bottom:0;left:0;right:0;z-index:5;
+ display:grid;grid-template-columns:repeat(4,1fr);
+ max-width:480px;margin:auto;padding:12px 10px calc(12px + env(safe-area-inset-bottom));
+ background:#050c0bee;backdrop-filter:blur(18px);
+ border-top:1px solid #16342c;
+}
+.nav button {border:0;background:none;color:#69877d;font-size:10px;padding:4px}
+.nav button span {display:block;font-size:21px;margin-bottom:4px}
+.nav button.active {color:var(--green)}
+.pageTitle {font-size:25px;margin:8px 0 20px}
+.card {padding:17px;border:1px solid var(--border);border-radius:19px;background:var(--panel);margin-bottom:13px}
+.fieldlabel {font-size:12px;color:#a6c5ba;display:block;margin:15px 0 8px}
+.field {
+ width:100%;padding:14px;border-radius:13px;border:1px solid #23443a;
+ background:#050c0b;color:#fff;outline:none;
+}
+.field:focus {border-color:var(--green)}
+.primary {
+ width:100%;padding:15px;border:0;border-radius:15px;margin-top:18px;
+ background:linear-gradient(100deg,#00e6a0,#00c8a0);color:#00251a;font-weight:800;
+ box-shadow:0 5px 20px #00e6a01b;
+}
+.secondary {padding:11px 14px;border-radius:12px;border:1px solid var(--border);background:#0b1714;color:var(--green)}
+.note {padding:12px;border:1px solid #27523f;background:#0a2118;border-radius:13px;color:#a5d7c3;font-size:12px;line-height:1.6}
+.empty {text-align:center;color:var(--muted);padding:35px 10px}
+.setting {justify-content:space-between;color:#d9eee6}
+.setting .arrow {color:var(--muted)}
+.tag {font-size:10px;color:var(--green);border:1px solid #16513d;border-radius:20px;padding:4px 7px}
+.toast {
+ position:fixed;left:50%;bottom:90px;transform:translate(-50%,20px);
+ background:#10251e;border:1px solid #247654;border-radius:12px;padding:12px 17px;
+ color:#dffff2;font-size:13px;opacity:0;pointer-events:none;transition:.25s;
+ z-index:10;width:max-content;max-width:90%;
+}
+.toast.show {opacity:1;transform:translate(-50%,0)}
+.footerNote {font-size:11px;color:#668278;text-align:center;margin:22px 0}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><div class="logo">₮</div><div>MiUSDT <span style="color:var(--green)">Wallet</span></div></div>
+    <button class="round" onclick="showPage('ajustes')" aria-label="Ajustes">⚙</button>
+  </header>
+
+  <div class="demo"><span class="dot"></span> MODO DEMOSTRACIÓN</div>
+
+  <main>
+    <section class="page active" id="inicio">
+      <div class="balance">
+        <div class="brow"><span>Saldo total</span><button onclick="toggleBalance()" style="border:0;background:none;color:var(--green)" id="eye">◉</button></div>
+        <div class="amount" id="balanceAmount">128.50 <small>USDT</small></div>
+        <div class="sub">≈ 128.50 USD · Saldo ficticio</div>
+        <div class="chart" aria-hidden="true">
+          <i style="height:28%"></i><i style="height:40%"></i><i style="height:34%"></i><i style="height:58%"></i><i style="height:48%"></i><i style="height:72%"></i><i style="height:63%"></i><i style="height:90%"></i><i style="height:76%"></i><i style="height:100%"></i>
+        </div>
+      </div>
+
+      <div class="networks">
+        <button class="net active" id="netTRC" onclick="setNetwork('TRC20')"><b>🔴 TRC20</b>Tron Network</button>
+        <button class="net" id="netBEP" onclick="setNetwork('BEP20')"><b>🟡 BEP20</b>BNB Smart Chain</button>
+      </div>
+
+      <div class="actions">
+        <button class="action" onclick="showPage('recibir')"><span>↓</span>Recibir</button>
+        <button class="action" onclick="showPage('enviar')"><span>↗</span>Enviar</button>
+        <button class="action" onclick="toast('El cambio entre monedas todavía no está habilitado')"><span>⇄</span>Cambiar</button>
+        <button class="action" onclick="showPage('activos')"><span>•••</span>Más</button>
+      </div>
+
+      <div class="sectionhead"><h2>Mis activos</h2><button class="link" onclick="showPage('activos')">Ver todos →</button></div>
+      <div class="asset"><div class="coin usdt">₮</div><div class="details"><b>USDT</b><small>Tether USD · Demo</small></div><div class="value" id="usdtValue">128.50<small>≈ 128.50 USD</small></div></div>
+      <div class="asset"><div class="coin trx">T</div><div class="details"><b>TRX</b><small>Tron</small></div><div class="value">0.0000<small>≈ 0.00 USD</small></div></div>
+      <div class="asset"><div class="coin bnb">◆</div><div class="details"><b>BNB</b><small>BNB Smart Chain</small></div><div class="value">0.0000<small>≈ 0.00 USD</small></div></div>
+
+      <div class="sectionhead"><h2>Actividad reciente</h2><button class="link" onclick="showPage('actividad')">Ver historial →</button></div>
+      <div id="recent"><div class="transaction"><div class="coin usdt">↓</div><div class="details"><b>USDT recibido</b><small>Movimiento de ejemplo</small></div><div class="value" style="color:var(--green)">+100.00<small>Demo</small></div></div></div>
+      <div class="note">🔒 Esta versión es una demostración visual. No contiene una billetera real ni envía criptomonedas.</div>
+    </section>
+
+    <section class="page" id="recibir">
+      <h1 class="pageTitle">Recibir USDT</h1>
+      <div class="card">
+        <div class="networks" style="margin-top:0">
+          <button class="net active" id="recvTRC" onclick="setNetwork('TRC20')"><b>🔴 TRC20</b>Tron</button>
+          <button class="net" id="recvBEP" onclick="setNetwork('BEP20')"><b>🟡 BEP20</b>BNB Chain</button>
+        </div>
+        <div style="text-align:center;padding:24px 0">
+          <div style="font-size:76px;color:var(--green);text-shadow:0 0 30px #00f5a055">▦</div>
+          <b>Tu dirección de recepción</b>
+          <p class="sub">La dirección real estará disponible cuando conectemos una billetera segura.</p>
+        </div>
+        <input class="field" id="receiveAddress" readonly value="DEMO-TRC20-ADDRESS-NOT-REAL">
+        <button class="primary" onclick="copyDemoAddress()">Copiar dirección de demostración</button>
+        <p class="note" style="margin-top:14px">No envíes fondos a esta dirección. Es ficticia y no puede recibir criptomonedas.</p>
+      </div>
+      <button class="secondary" onclick="showPage('inicio')">← Volver al inicio</button>
+    </section>
+
+    <section class="page" id="enviar">
+      <h1 class="pageTitle">Enviar USDT</h1>
+      <div class="card">
+        <div class="note">Modo de prueba: el formulario no realiza transferencias reales.</div>
+        <div class="networks">
+          <button class="net active" id="sendTRC" onclick="setNetwork('TRC20')"><b>🔴 TRC20</b>Tron</button>
+          <button class="net" id="sendBEP" onclick="setNetwork('BEP20')"><b>🟡 BEP20</b>BNB Chain</button>
+        </div>
+        <label class="fieldlabel" for="destination">Dirección del destinatario</label>
+        <input class="field" id="destination" placeholder="Dirección de ejemplo">
+        <label class="fieldlabel" for="sendAmount">Importe (USDT)</label>
+        <input class="field" id="sendAmount" type="number" min="0" step="any" placeholder="0.00" inputmode="decimal">
+        <p class="sub" style="margin-top:12px">Saldo disponible de demostración: 128.50 USDT</p>
+        <button class="primary" onclick="demoSend()">Continuar en modo demo</button>
+      </div>
+    </section>
+
+    <section class="page" id="actividad">
+      <h1 class="pageTitle">Actividad</h1>
+      <div class="networks">
+        <button class="net active" onclick="filterActivity('Todos',this)">Todos</button>
+        <button class="net" onclick="filterActivity('Recibidos',this)">Recibidos</button>
+      </div>
+      <div id="history">
+        <div class="transaction" data-type="Recibidos"><div class="coin usdt">↓</div><div class="details"><b>USDT recibido</b><small>TRC20 · Movimiento de ejemplo</small></div><div class="value" style="color:var(--green)">+100.00<small>Demo</small></div></div>
+        <div class="transaction" data-type="Enviados"><div class="coin trx">↑</div><div class="details"><b>USDT enviado</b><small>BEP20 · Movimiento de ejemplo</small></div><div class="value" style="color:var(--red)">-12.00<small>Demo</small></div></div>
+        <div class="transaction" data-type="Recibidos"><div class="coin usdt">↓</div><div class="details"><b>USDT recibido</b><small>BEP20 · Movimiento de ejemplo</small></div><div class="value" style="color:var(--green)">+50.00<small>Demo</small></div></div>
+      </div>
+      <p class="footerNote">Los movimientos mostrados son ficticios.</p>
+    </section>
+
+    <section class="page" id="activos">
+      <h1 class="pageTitle">Mis activos</h1>
+      <div class="balance" style="margin-bottom:18px"><div class="sub">Valor total · DEMO</div><div class="amount">128.50 <small>USDT</small></div><div class="sub">Valor ilustrativo, no conectado a la blockchain</div></div>
+      <div class="asset"><div class="coin usdt">₮</div><div class="details"><b>Tether USD</b><small>USDT</small></div><div class="value">128.50<small>Demo</small></div></div>
+      <div class="asset"><div class="coin trx">T</div><div class="details"><b>Tron</b><small>TRX</small></div><div class="value">0.0000</div></div>
+      <div class="asset"><div class="coin bnb">◆</div><div class="details"><b>BNB</b><small>BNB Smart Chain</small></div><div class="value">0.0000</div></div>
+      <div class="sectionhead"><h2>Redes disponibles</h2></div>
+      <div class="asset"><div class="coin trx">T</div><div class="details"><b>Tron · TRC20</b><small>Red seleccionable</small></div><span class="tag">Disponible en demo</span></div>
+      <div class="asset"><div class="coin bnb">◆</div><div class="details"><b>BNB Smart Chain · BEP20</b><small>Red seleccionable</small></div><span class="tag">Disponible en demo</span></div>
+    </section>
+
+    <section class="page" id="ajustes">
+      <h1 class="pageTitle">Ajustes</h1>
+      <div class="card">
+        <div class="brand"><div class="logo">₮</div><div>MiUSDT Wallet<small style="display:block;color:var(--muted);font-size:11px;font-weight:400;margin-top:4px">Interfaz futurista · Versión demo</small></div></div>
+      </div>
+      <div class="setting"><span>🛡️ Seguridad</span><span class="arrow">›</span></div>
+      <div class="setting"><span>🌐 Redes compatibles</span><span class="arrow">›</span></div>
+      <div class="setting" onclick="toast('La copia de seguridad se añadirá al implementar la billetera real')"><span>🔑 Copia de seguridad</span><span class="arrow">›</span></div>
+      <div class="setting" onclick="toast('MiUSDT Wallet · Prototipo de demostración')"><span>ℹ️ Acerca de</span><span class="arrow">›</span></div>
+      <div class="note" style="margin-top:17px">La seguridad de una billetera real requiere generación y protección local de claves, firma de transacciones y pruebas específicas. Esta versión no gestiona claves privadas.</div>
+    </section>
+  </main>
+</div>
+
+<nav class="nav">
+  <button class="active" data-page="inicio" onclick="showPage('inicio')"><span>⌂</span>Inicio</button>
+  <button data-page="actividad" onclick="showPage('actividad')"><span>⇄</span>Actividad</button>
+  <button data-page="activos" onclick="showPage('activos')"><span>▣</span>Activos</button>
+  <button data-page="ajustes" onclick="showPage('ajustes')"><span>⚙</span>Ajustes</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+let network='TRC20';
+let hidden=false;
+let toastTimer;
+
+function showPage(name){
+ document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+ const page=document.getElementById(name);
+ if(page) page.classList.add('active');
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+ window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function setNetwork(value){
+ network=value;
+ ['TRC20','BEP20'].forEach(n=>{
+  const active=n===value;
+  ['net','recv','send'].forEach(prefix=>{
+   const el=document.getElementById(prefix+n.replace('TRC20','TRC').replace('BEP20','BEP'));
+   if(el) el.classList.toggle('active',active);
+  });
+ });
+ const address=document.getElementById('receiveAddress');
+ if(address) address.value='DEMO-'+network+'-ADDRESS-NOT-REAL';
+ toast('Red seleccionada: '+network+' · Solo demostración');
+}
+
+function toggleBalance(){
+ hidden=!hidden;
+ document.getElementById('balanceAmount').innerHTML=hidden?'•••••• <small>USDT</small>':'128.50 <small>USDT</small>';
+ document.getElementById('usdtValue').innerHTML=hidden?'••••••<small>Saldo oculto</small>':'128.50<small>≈ 128.50 USD</small>';
+ document.getElementById('eye').textContent=hidden?'◎':'◉';
+}
+
+function toast(message){
+ const el=document.getElementById('toast');
+ el.textContent=message;
+ el.classList.add('show');
+ clearTimeout(toastTimer);
+ toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+function copyDemoAddress(){
+ const address=document.getElementById('receiveAddress').value;
+ if(navigator.clipboard && window.isSecureContext){
+  navigator.clipboard.writeText(address).then(()=>toast('Dirección ficticia copiada')).catch(()=>toast(address));
+ } else {
+  const field=document.getElementById('receiveAddress');
+  field.select();
+  try {document.execCommand('copy');toast('Dirección ficticia copiada');}
+  catch(e){toast(address);}
+ }
+}
+
+function demoSend(){
+ const destination=document.getElementById('destination').value.trim();
+ const amount=Number(document.getElementById('sendAmount').value);
+ if(!destination){toast('Escribe una dirección de ejemplo');return;}
+ if(!Number.isFinite(amount)||amount<=0){toast('Introduce un importe válido');return;}
+ toast('Simulación solamente: no se ha enviado dinero');
+}
+
+function filterActivity(type,button){
+ document.querySelectorAll('#history .transaction').forEach(item=>{
+  item.style.display=(type==='Todos'||item.dataset.type===type)?'flex':'none';
+ });
+ document.querySelectorAll('#actividad .net').forEach(b=>b.classList.remove('active'));
+ button.classList.add('active');
+}
+</script>
+</body>
+</html>
